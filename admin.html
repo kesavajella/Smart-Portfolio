@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Admin | Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <h1>Admin Dashboard</h1>
+      <a href="index.html" class="btn">Exit</a>
+    </div>
+  </header>
+
+  <main>
+    <div id="step-login" class="admin-card active">
+      <h2 style="margin-bottom:20px">🔒 Restricted Access</h2>
+      <input type="password" id="adminPass" placeholder="Enter Secret Key">
+      <button onclick="checkAuth()" class="btn fill" style="width:100%">Enter Dashboard</button>
+    </div>
+
+    <div id="step-photo" class="admin-card">
+      <h2>Step 1: Update Hero Image</h2>
+      <p style="margin-bottom:20px; color: var(--muted)">Provide a URL for your profile photo.</p>
+      <input type="url" id="photoUrl" placeholder="https://example.com/image.jpg">
+      <button onclick="savePhoto()" class="btn fill">Next: Update Skills</button>
+    </div>
+
+    <div id="step-skills" class="admin-card">
+      <h2>Step 2: Technical Skills</h2>
+      <p style="margin-bottom:20px; color: var(--muted)">Enter skills separated by commas.</p>
+      <textarea id="skillsList" placeholder="Java, React, SQL, Python..."></textarea>
+      <button onclick="saveSkills()" class="btn fill">Next: Add Projects</button>
+    </div>
+
+    <div id="step-projects" class="admin-card">
+      <h2>Step 3: Project Management</h2>
+      <form id="projectForm" style="margin-top:20px">
+        <input type="text" id="pTitle" placeholder="Project Title" required>
+        <textarea id="pDesc" placeholder="Brief Description" required></textarea>
+        <input type="text" id="pTech" placeholder="Tech Used (comma separated)">
+        <input type="file" id="pMedia" accept="image/*,video/*" required>
+        <button type="submit" class="btn fill" style="width:100%">Upload Project</button>
+      </form>
+      
+      <table class="proj-table">
+        <tbody id="projListBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>© 2025 Jella Kesava Krishna Pavan</footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getFirestore, doc, setDoc, collection, getDocs, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFMubpD-kADaPCfpRNZltcvcUOF8FxM2Q",
+      authDomain: "portfolio-k78615.firebaseapp.com",
+      projectId: "portfolio-k78615",
+      storageBucket: "portfolio-k78615.appspot.com",
+      messagingSenderId: "964001708850",
+      appId: "1:964001708850:web:fe381d8843621139aab52b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // NAVIGATION LOGIC
+    window.showStep = (id) => {
+      document.querySelectorAll('.admin-card').forEach(c => c.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    };
+
+    window.checkAuth = () => {
+      if(document.getElementById('adminPass').value === "1234") { // Change this password!
+        showStep('step-photo');
+      } else { alert("Access Denied"); }
+    };
+
+    window.savePhoto = async () => {
+      const url = document.getElementById('photoUrl').value;
+      await setDoc(doc(db, "admin_config", "config"), { profilePhoto: url }, { merge: true });
+      showStep('step-skills');
+    };
+
+    window.saveSkills = async () => {
+      const skills = document.getElementById('skillsList').value.split(',').map(s => s.trim());
+      await setDoc(doc(db, "admin_data", "data"), { skills: skills }, { merge: true });
+      loadProjects();
+      showStep('step-projects');
+    };
+
+    // PROJECT LOGIC
+    const form = document.getElementById("projectForm");
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const file = document.getElementById("pMedia").files[0];
+      const fileRef = ref(storage, `projects/${Date.now()}_${file.name}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+
+      await addDoc(collection(db, "projects"), {
+        title: document.getElementById("pTitle").value,
+        description: document.getElementById("pDesc").value,
+        technologies: document.getElementById("pTech").value.split(","),
+        image: url,
+        position: Date.now()
+      });
+      form.reset();
+      loadProjects();
+    };
+
+    async function loadProjects() {
+      const snap = await getDocs(collection(db, "projects"));
+      const body = document.getElementById('projListBody');
+      body.innerHTML = "";
+      snap.forEach(d => {
+        body.innerHTML += `<tr><td>${d.data().title}</td><td><button onclick="delProj('${d.id}')" class="del-btn">Delete</button></td></tr>`;
+      });
+    }
+
+    window.delProj = async (id) => {
+      if(confirm("Delete project?")) {
+        await deleteDoc(doc(db, "projects", id));
+        loadProjects();
+      }
+    };
+  </script>
+</body>
+</html>

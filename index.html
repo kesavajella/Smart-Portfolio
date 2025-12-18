@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jella Kesava Krishna Pavan | Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="navbar">
+    <h1>JK Krishna Pavan</h1>
+    
+    <div class="menu-icon" id="menu-btn">☰</div>
+
+    <ul class="nav-links" id="nav-menu">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <div class="hero-content reveal">
+      <h2 class="typing-container">Hello, I'm <br><span id="typing-name"></span></h2>
+      <p class="hero-desc">Java Full Stack Developer & Data Analyst</p>
+      <div class="hero-buttons">
+        <a href="projects.html" class="btn fill">View Projects</a>
+        <a href="contact.html" class="btn">Contact Me</a>
+      </div>
+    </div>
+
+    <div class="hero-img reveal">
+      <img id="hero-photo" alt="Profile Photo" src="https://via.placeholder.com/300x400">
+    </div>
+  </section>
+
+  <section id="about">
+    <h2 class="section-title">About Me</h2>
+    <div class="about-box reveal">
+      <p id="about-text">Loading profile details...</p>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2 class="section-title">Technical Skills</h2>
+    <div class="skills-grid reveal" id="skills-grid">
+      </div>
+  </section>
+</main>
+
+<footer>
+  © 2025 Jella Kesava Krishna Pavan
+</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCFMubpD-kADaPCfpRNZltcvcUOF8FxM2Q",
+  authDomain: "portfolio-k78615.firebaseapp.com",
+  projectId: "portfolio-k78615",
+  storageBucket: "portfolio-k78615.appspot.com",
+  messagingSenderId: "964001708850",
+  appId: "1:964001708850:web:fe381d8843621139aab52b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Load Data
+async function loadData() {
+  const configSnap = await getDoc(doc(db, "admin_config", "config"));
+  if(configSnap.exists()) document.getElementById("hero-photo").src = configSnap.data().profilePhoto;
+
+  const dataSnap = await getDoc(doc(db, "admin_data", "data"));
+  if(dataSnap.exists()) {
+    const data = dataSnap.data();
+    document.getElementById("about-text").textContent = data.about;
+    document.getElementById("skills-grid").innerHTML = data.skills.map(s => `<div class="skill">${s}</div>`).join("");
+  }
+}
+
+// Typing effect
+const fullName = "Kesava Krishna Pavan";
+const typingSpan = document.getElementById("typing-name");
+let charIdx = 0;
+function typeWriter() {
+  if (charIdx < fullName.length) {
+    typingSpan.textContent += fullName.charAt(charIdx);
+    charIdx++;
+    setTimeout(typeWriter, 120);
+  }
+}
+
+// Mobile Menu Logic
+const menuBtn = document.getElementById('menu-btn');
+const navMenu = document.getElementById('nav-menu');
+
+menuBtn.onclick = (e) => {
+  navMenu.classList.toggle('active');
+  e.stopPropagation();
+};
+
+document.onclick = (e) => {
+  if (!navMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+    navMenu.classList.remove('active');
+  }
+};
+
+// Reveal observer
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add("show"); });
+}, { threshold: 0.1 });
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+window.onload = () => { loadData(); typeWriter(); };
+</script>
+</body>
+</html>
