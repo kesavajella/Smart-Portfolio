@@ -59,7 +59,7 @@
 
         .nav-wrapper { display: flex; align-items: center; gap: 10px; }
         .nav { display: flex; list-style: none; gap: 5px; margin: 0; padding: 0; align-items: center; }
-        .nav a { color: white; text-decoration: none; padding: 8px 12px; font-size: 0.95rem; transition: 0.3s; }
+        .nav a { color: white; text-decoration: none; padding: 8px 12px; font-size: 0.95rem; transition: 0.3s; cursor: pointer; }
         .nav a:hover { color: var(--primary-color); }
         
         #admin-link {
@@ -77,7 +77,7 @@
             margin-left: 10px;
         }
 
-        /* --- MOBILE NAVIGATION BOX STYLE --- */
+        /* --- MOBILE NAVIGATION --- */
         @media (max-width: 768px) { 
             .menu-toggle { display: block; }
             
@@ -125,6 +125,44 @@
             }
         }
 
+        /* --- RESPONSIVE GLOW SYSTEM --- */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); border-color: rgba(0, 210, 255, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.5); border-color: rgba(0, 210, 255, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); border-color: rgba(0, 210, 255, 0.3); }
+        }
+
+        .view-work-btn, .filter-btn, .action-btn {
+            transition: all 0.3s ease-in-out;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Constant animation for Stat Blocks on all devices */
+        .stat-block { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(0, 210, 255, 0.3); 
+            border-radius: 15px; 
+            padding: 25px; 
+            text-align: center; 
+            animation: pulseGlow 3s infinite ease-in-out;
+            transition: 0.3s ease;
+            outline: none;
+        }
+
+        /* Enhanced intensity on Hover (PC) or Tap (Mobile) */
+        .stat-block:hover, .stat-block:active, .stat-block:focus {
+            animation: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px var(--primary-color);
+            transform: translateY(-5px);
+            background: rgba(0, 210, 255, 0.1);
+        }
+
+        .view-work-btn:hover, .view-work-btn:active {
+            box-shadow: 0 0 25px var(--primary-color);
+            transform: scale(1.05);
+        }
+
         /* --- SECTIONS --- */
         .glowing-section {
             margin: 40px 20px;
@@ -144,12 +182,10 @@
         @keyframes moveDots { 0% { transform: translateY(100vh) translateX(0); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: translateY(-10vh) translateX(50px); opacity: 0; } }
         .hero-text { flex: 1; text-align: left; }
         .typing-container { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--primary-color); }
-        .view-work-btn { display: inline-block; margin-top: 30px; padding: 12px 35px; background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; text-decoration: none; border-radius: 50px; font-weight: bold; transition: 0.3s; border: none; cursor: pointer; }
+        .view-work-btn { display: inline-block; margin-top: 30px; padding: 12px 35px; background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; text-decoration: none; border-radius: 50px; font-weight: bold; border: none; cursor: pointer; }
         .profile-photo { width: clamp(250px, 30vw, 350px); height: clamp(250px, 30vw, 350px); border-radius: 50%; border: 5px solid var(--primary-color); object-fit: cover; margin-left: 20px; }
 
-        /* --- DASHBOARD --- */
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto 40px; }
-        .stat-block { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 15px; padding: 25px; text-align: center; }
         .stat-block i { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 10px; display: block; }
         .stat-block h3 { font-size: 2rem; margin: 5px 0; }
 
@@ -183,7 +219,7 @@
         .demo-btn { background: #00d2ff; color: #000; }
         .git-btn { background: #333; color: #fff; border: 1px solid #555; }
 
-        /* --- FOOTER RESTORED --- */
+        /* --- FOOTER --- */
         .unified-footer {
             background: #050f13;
             border-top: 1px solid rgba(0, 210, 255, 0.2);
@@ -218,7 +254,6 @@
             .hero-container { flex-direction: column-reverse; text-align: center; }
             .profile-photo { margin-left: 0; margin-bottom: 20px; }
             .modal-body { flex-direction: column; }
-            /* Footer Mobile: Center Links first, then Details, then Copyright */
             .footer-container { flex-direction: column; text-align: center; align-items: center; }
             .footer-left { order: 1; text-align: center; }
             .social-links { justify-content: center; }
@@ -230,16 +265,16 @@
 
 <header class="header">
     <div class="header-content">
-        <a href="#home" class="logo">Jella Kesava Krishna Pavan</a>
+        <a onclick="navigateToHome()" class="logo" style="cursor: pointer;">Jella Kesava Krishna Pavan</a>
         <div class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></div>
         <div class="nav-wrapper" id="navWrapper">
             <nav id="navbar">
                 <ul class="nav">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#home" onclick="setTimeout(()=>scrollToSection('about-me'),100)">About</a></li>
-                    <li><a href="#home" onclick="setTimeout(()=>scrollToSection('skills'),100)">Skills</a></li>
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a onclick="navigateToHome()">Home</a></li>
+                    <li><a onclick="scrollToSection('about-me')">About</a></li>
+                    <li><a onclick="scrollToSection('skills')">Skills</a></li>
+                    <li><a href="#projects" onclick="closeMobileMenu()">Projects</a></li>
+                    <li><a href="#contact" onclick="closeMobileMenu()">Contact</a></li>
                     <li><a href="admin.html" id="admin-link">Admin</a></li>
                 </ul>
             </nav>
@@ -263,10 +298,7 @@
         </section>
         <section id="about-me" class="glowing-section">
             <h2 style="color:var(--primary-color);">About Me</h2>
-            <p id="about-text" style="font-size: 1.2rem; line-height: 1.8; color: #ccc;">Currently pursuing my B.Tech at Aditya Engineering College, I have cultivated a robust foundation in engineering principles and a specialized focus on modern software development. My academic journey is defined by a relentless drive to bridge the gap between complex theoretical concepts and high-impact, real-world applications. As a Java Full Stack Developer and Data Analyst, I specialize in building scalable, secure, and user-centric digital solutions, leveraging the power of the Java ecosystem alongside modern frontend technologies to deliver seamless end-to-end experiences.
-
-Beyond core development, I am deeply passionate about the intersection of data and decision-making. My expertise in Data Analytics allows me to extract meaningful insights from complex datasets, transforming raw information into strategic advantages. I thrive in collaborative environments where innovation is the standard, and I am committed to continuous learning in the ever-evolving tech landscape. With a blend of analytical rigor and creative problem-solving, I aim to build robust architectures and data-driven systems that solve meaningful problems and drive technological progress.`;
-</p>
+            <p id="about-text" style="font-size: 1.2rem; line-height: 1.8; color: #ccc;">Currently pursuing my B.Tech at Aditya Engineering College, I have cultivated a robust foundation in engineering principles and a specialized focus on modern software development. My academic journey is defined by a relentless drive to bridge the gap between complex theoretical concepts and high-impact, real-world applications. As a Java Full Stack Developer and Data Analyst, I specialize in building scalable, secure, and user-centric digital solutions, leveraging the power of the Java ecosystem alongside modern frontend technologies to deliver seamless end-to-end experiences. Beyond core development, I am deeply passionate about the intersection of data and decision-making. My expertise in Data Analytics allows me to extract meaningful insights from complex datasets, transforming raw information into strategic advantages.</p>
         </section>
         <section id="skills" class="glowing-section">
             <h2 style="color:var(--primary-color);">Technical Skills</h2>
@@ -281,10 +313,10 @@ Beyond core development, I am deeply passionate about the intersection of data a
         </div>
         
         <div class="stats-container">
-            <div class="stat-block"><i class="fas fa-project-diagram"></i><h3 id="stat-total">0</h3><p>Projects</p></div>
-            <div class="stat-block"><i class="fas fa-code"></i><h3 id="stat-tech">0</h3><p>Technologies</p></div>
-            <div class="stat-block"><i class="fas fa-calendar-check"></i><h3 id="stat-active">0</h3><p>Active</p></div>
-            <div class="stat-block"><i class="fas fa-star"></i><h3 id="stat-featured">0</h3><p>Featured</p></div>
+            <div class="stat-block" tabindex="0"><i class="fas fa-project-diagram"></i><h3 id="stat-total">0</h3><p>Projects</p></div>
+            <div class="stat-block" tabindex="0"><i class="fas fa-code"></i><h3 id="stat-tech">0</h3><p>Technologies</p></div>
+            <div class="stat-block" tabindex="0"><i class="fas fa-calendar-check"></i><h3 id="stat-active">0</h3><p>Active</p></div>
+            <div class="stat-block" tabindex="0"><i class="fas fa-star"></i><h3 id="stat-featured">0</h3><p>Featured</p></div>
         </div>
 
         <div class="filter-section">
@@ -373,7 +405,6 @@ Beyond core development, I am deeply passionate about the intersection of data a
     const fullName = "Jella Kesava Krishna Pavan";
     let charIdx = 0;
 
-    // Mobile Menu Logic
     const menuToggle = document.getElementById('menuToggle');
     const navWrapper = document.getElementById('navWrapper');
 
@@ -385,10 +416,14 @@ Beyond core development, I am deeply passionate about the intersection of data a
 
     document.addEventListener('click', (e) => {
         if (!navWrapper.contains(e.target) && e.target !== menuToggle) {
-            navWrapper.classList.remove('active');
-            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            closeMobileMenu();
         }
     });
+
+    window.closeMobileMenu = () => {
+        navWrapper.classList.remove('active');
+        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    };
 
     async function loadData() {
         const configSnap = await getDoc(doc(db, "admin_config", "config"));
@@ -466,7 +501,7 @@ Beyond core development, I am deeply passionate about the intersection of data a
         document.getElementById('modalDesc').textContent = p.description;
         document.getElementById('modalTechGrid').innerHTML = (p.technologies || []).map(t => `<span class="tech-tag" style="background:rgba(0,210,255,0.2); color:white;">${t}</span>`).join('');
         document.getElementById('modalVideoContainer').innerHTML = p.video ? `<video src="${p.video}" controls autoplay style="width:100%; border-radius:10px;"></video>` : `<img src="${p.image}" style="width:100%; border-radius:10px;">`;
-        document.getElementById('liveDemoLink').href = p.liveDemo || "#";
+        document.getElementById('liveDemoLink').href = p.live || "#";
         document.getElementById('githubLink').href = p.github || "#";
         document.getElementById('projectModal').style.display = 'flex';
         document.body.style.overflow = 'hidden'; 
@@ -480,16 +515,21 @@ Beyond core development, I am deeply passionate about the intersection of data a
 
     function handleRoute() {
         const hash = window.location.hash.replace('#', '') || 'home';
-        navWrapper.classList.remove('active');
-        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
-
         const adminLink = document.getElementById('admin-link');
         adminLink.style.display = (hash === 'projects') ? 'block' : 'none';
 
         document.querySelectorAll('.page-view').forEach(v => v.style.display = 'none');
         const view = document.getElementById(`view-${hash}`);
-        if (view) { view.style.display = 'block'; if (hash === 'home') { typeWriter(); initHomeDots(); } }
-        window.scrollTo(0, 0);
+        if (view) { 
+            view.style.display = 'block'; 
+            if (hash === 'home') { 
+                if(document.getElementById("typewriter").innerHTML === "") typeWriter(); 
+                initHomeDots(); 
+            } 
+        }
+        if(hash !== 'home' || !window.location.hash.includes('home')) {
+             window.scrollTo(0, 0);
+        }
     }
 
     function typeWriter() {
@@ -510,7 +550,31 @@ Beyond core development, I am deeply passionate about the intersection of data a
         }
     }
 
-    window.scrollToSection = (id) => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    window.navigateToHome = () => {
+        closeMobileMenu();
+        if (window.location.hash === '' || window.location.hash === '#home') {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        } else {
+            window.location.hash = 'home';
+            handleRoute();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+    };
+
+    window.scrollToSection = (id) => {
+        closeMobileMenu();
+        if (window.location.hash !== '' && window.location.hash !== '#home') {
+            window.location.hash = 'home';
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if(el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 150);
+        } else {
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     window.addEventListener('hashchange', handleRoute);
     window.addEventListener('load', () => { loadData(); handleRoute(); });
 </script>
