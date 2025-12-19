@@ -86,11 +86,13 @@
                 top: 75px;
                 right: 20px;
                 width: 220px;
-                background: #007bff; 
+                /* Background changed to match portfolio theme */
+                background: var(--dark-bg); 
                 flex-direction: column;
                 padding: 25px 15px;
                 border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                border: 1px solid var(--primary-color);
+                box-shadow: 0 10px 30px rgba(0, 210, 255, 0.3);
                 display: none; 
                 opacity: 0;
                 transform: translateY(-10px);
@@ -112,14 +114,14 @@
                 margin: 15px auto 0;
                 width: 55px;
                 height: 55px;
-                border: 2px solid white;
+                border: 2px solid var(--primary-color);
             }
 
             .nav::after {
                 content: "";
                 width: 70%;
                 height: 1px;
-                background: rgba(255,255,255,0.3);
+                background: rgba(0, 210, 255, 0.3);
                 margin: 10px auto;
                 order: 9;
             }
