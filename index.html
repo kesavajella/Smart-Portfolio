@@ -86,7 +86,6 @@
                 top: 75px;
                 right: 20px;
                 width: 220px;
-                /* Background changed to match portfolio theme */
                 background: var(--dark-bg); 
                 flex-direction: column;
                 padding: 25px 15px;
@@ -139,7 +138,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Constant animation for Stat Blocks on all devices */
         .stat-block { 
             background: rgba(255, 255, 255, 0.05); 
             border: 1px solid rgba(0, 210, 255, 0.3); 
@@ -151,7 +149,6 @@
             outline: none;
         }
 
-        /* Enhanced intensity on Hover (PC) or Tap (Mobile) */
         .stat-block:hover, .stat-block:active, .stat-block:focus {
             animation: none;
             border-color: var(--primary-color);
@@ -304,7 +301,7 @@
         </section>
         <section id="skills" class="glowing-section">
             <h2 style="color:var(--primary-color);">Technical Skills</h2>
-            <div id="skills-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:20px;"></div>
+            <div id="skills-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px;"></div>
         </section>
     </div>
 
@@ -371,11 +368,11 @@
         <div class="footer-left">
             <h3 style="color:var(--primary-color); margin-bottom:10px;">Connect With Me</h3>
             <div class="social-links">
-                <a href="www.linkedin.com/in/kesava-jella" target="_blank"><i class="fab fa-linkedin"></i></a>
-                <a href="https://leetcode.com/u/Kesava78615/" target="_blank"><i class="fab fa-github"></i></a>
-                <a href="#" target="_blank"><i class="fas fa-code"></i></a>
-                <a href="#" target="_blank"><i class="fas fa-terminal"></i></a>
-                <a href="#" target="_blank"><i class="fas fa-laptop-code"></i></a>
+                <a href="https://www.linkedin.com/in/kesava-jella" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="https://wwww.github.com/kesavajella" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://leetcode.com/u/Kesava78615/" target="_blank"><i class="fas fa-code"></i></a>
+                <a href="https://www.geeksforgeeks.org/user/kesava78615/" target="_blank"><i class="fas fa-terminal"></i></a>
+                <a href="https://www.codechef.com/users/kesava78615" target="_blank"><i class="fas fa-laptop-code"></i></a>
             </div>
         </div>
         <div class="footer-right">
@@ -434,9 +431,48 @@
             document.querySelectorAll('.profile-img-sync').forEach(img => img.src = url);
             document.getElementById('hero-photo').src = url;
         }
+        
+        // --- UPDATED SKILLS RENDERING: Handling the array of objects as per image structure ---
         const dataSnap = await getDoc(doc(db, "admin_data", "data"));
         if (dataSnap.exists()) {
-            document.getElementById('skills-grid').innerHTML = (dataSnap.data().skills || []).map(s => `<div style="background:#fff; color:#000; padding:15px; border-radius:10px; text-align:center; font-weight:bold;">${s}</div>`).join('');
+            // Updated to pull 'skills_ordered' which is now an array
+            const skills_ordered = dataSnap.data().skills_ordered || [];
+            const skillsGrid = document.getElementById('skills-grid');
+            skillsGrid.innerHTML = ''; 
+
+            // Iterate through the array objects (category, position, skills)
+            skills_ordered.sort((a, b) => (a.position || 0) - (b.position || 0)).forEach((skillObj) => {
+                const category = skillObj.category;
+                const skillsString = skillObj.skills;
+
+                if(!skillsString || !category) return; 
+
+                const categoryBlock = document.createElement('div');
+                categoryBlock.className = 'stat-block'; 
+                categoryBlock.style.textAlign = 'left';
+                categoryBlock.style.padding = '20px';
+                
+                const skillList = skillsString.split(',').map(s => s.trim()).filter(s => s !== "");
+                
+                let iconClass = 'fa-code'; 
+                const lowerCat = category.toLowerCase();
+                if(lowerCat.includes('front')) iconClass = 'fa-laptop-code';
+                else if(lowerCat.includes('back')) iconClass = 'fa-server';
+                else if(lowerCat.includes('data')) iconClass = 'fa-database';
+                else if(lowerCat.includes('tool')) iconClass = 'fa-tools';
+                else if(lowerCat.includes('lang')) iconClass = 'fa-terminal';
+
+                categoryBlock.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; border-bottom:1px solid rgba(0,210,255,0.2); padding-bottom:10px;">
+                        <i class="fas ${iconClass}" style="font-size:1.2rem; margin-bottom:0; color:var(--primary-color);"></i>
+                        <h3 style="font-size:1.1rem; margin:0; color:var(--primary-color); text-transform:uppercase; letter-spacing:1px;">${category}</h3>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                        ${skillList.map(skill => `<span class="tech-tag" style="background:rgba(255,255,255,0.08); color:white; border:1px solid rgba(0,210,255,0.2);">${skill}</span>`).join('')}
+                    </div>
+                `;
+                skillsGrid.appendChild(categoryBlock);
+            });
         }
 
         const q = query(collection(db, "projects"), orderBy("position", "asc"));
@@ -582,4 +618,3 @@
 </script>
 </body>
 </html>
-
