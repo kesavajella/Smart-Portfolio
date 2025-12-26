@@ -218,43 +218,93 @@
         .demo-btn { background: #00d2ff; color: #000; }
         .git-btn { background: #333; color: #fff; border: 1px solid #555; }
 
-        /* --- FOOTER --- */
+        /* Education Specific Styling */
+        .edu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .edu-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 0 15px 15px 0;
+            transition: 0.3s;
+            position: relative;
+        }
+        .edu-card:hover {
+            background: rgba(0, 210, 255, 0.1);
+            transform: scale(1.02);
+        }
+        .edu-year {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .edu-degree {
+            font-size: 1.2rem;
+            margin: 5px 0;
+            color: #fff;
+        }
+        .edu-inst {
+            color: #ccc;
+            font-size: 1rem;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        .edu-score {
+            display: inline-block;
+            background: rgba(0, 210, 255, 0.2);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 1px solid var(--primary-color);
+            margin-top: 5px;
+        }
+
+        /* --- RESTORED FOOTER STYLES --- */
         .unified-footer {
-            background: #050f13;
+            padding: 40px 20px 20px;
+            background: rgba(0, 0, 0, 0.4);
             border-top: 1px solid rgba(0, 210, 255, 0.2);
-            padding: 50px 20px 20px;
             margin-top: auto;
         }
         .footer-container {
-            display: flex;
-            justify-content: space-between;
             max-width: 1200px;
             margin: 0 auto;
-            flex-wrap: wrap;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             gap: 30px;
         }
-        .footer-left { text-align: left; flex: 1; min-width: 280px; }
-        .footer-right { text-align: right; flex: 1; min-width: 280px; }
+        .footer-left { flex: 1; }
+        .footer-right { flex: 1; text-align: right; }
         .social-links { display: flex; gap: 20px; margin-top: 15px; }
-        .social-links a { color: white; font-size: 1.5rem; transition: 0.3s; text-decoration: none; }
-        .social-links a:hover { color: var(--primary-color); transform: translateY(-3px); }
-        .footer-right p { margin: 5px 0; font-size: 0.95rem; color: #ccc; }
-        .footer-right strong { color: var(--primary-color); font-size: 1.1rem; }
+        .social-links a { color: white; font-size: 1.6rem; transition: 0.3s ease; }
+        .social-links a:hover { color: var(--primary-color); transform: translateY(-5px); }
+        .footer-right strong { color: var(--primary-color); font-size: 1.2rem; display: block; margin-bottom: 10px; }
+        .footer-right p { margin: 5px 0; color: #ccc; font-size: 0.95rem; }
         .copyright-area {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.85rem;
-            opacity: 0.6;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         @media (max-width: 768px) { 
             .hero-container { flex-direction: column-reverse; text-align: center; }
             .profile-photo { margin-left: 0; margin-bottom: 20px; }
             .modal-body { flex-direction: column; }
+            /* Footer mobile centering and order */
             .footer-container { flex-direction: column; text-align: center; align-items: center; }
-            .footer-left { order: 1; text-align: center; }
+            .footer-left { order: 1; display: flex; flex-direction: column; align-items: center; }
             .social-links { justify-content: center; }
             .footer-right { order: 2; text-align: center; }
         }
@@ -271,6 +321,7 @@
                 <ul class="nav">
                     <li><a onclick="navigateToHome()">Home</a></li>
                     <li><a onclick="scrollToSection('about-me')">About</a></li>
+                    <li><a onclick="scrollToSection('education')">Education</a></li>
                     <li><a onclick="scrollToSection('skills')">Skills</a></li>
                     <li><a href="#projects" onclick="closeMobileMenu()">Projects</a></li>
                     <li><a href="#contact" onclick="closeMobileMenu()">Contact</a></li>
@@ -295,10 +346,39 @@
                 <img src="" id="hero-photo" class="profile-photo">
             </div>
         </section>
+
         <section id="about-me" class="glowing-section">
             <h2 style="color:var(--primary-color);">About Me</h2>
             <p id="about-text" style="font-size: 1.2rem; line-height: 1.8; color: #ccc;">Currently pursuing my B.Tech at Aditya Engineering College, I have cultivated a robust foundation in engineering principles and a specialized focus on modern software development. My academic journey is defined by a relentless drive to bridge the gap between complex theoretical concepts and high-impact, real-world applications. As a Java Full Stack Developer and Data Analyst, I specialize in building scalable, secure, and user-centric digital solutions, leveraging the power of the Java ecosystem alongside modern frontend technologies to deliver seamless end-to-end experiences. Beyond core development, I am deeply passionate about the intersection of data and decision-making. My expertise in Data Analytics allows me to extract meaningful insights from complex datasets, transforming raw information into strategic advantages.</p>
         </section>
+
+        <section id="education" class="glowing-section">
+            <h2 style="color:var(--primary-color);">Education</h2>
+            <div class="edu-grid">
+                <div class="edu-card">
+                    <span class="edu-year">2022 — Present</span>
+                    <h3 class="edu-degree">Bachelor of Technology (B.Tech)</h3>
+                    <p class="edu-inst">Aditya Engineering College</p>
+                    <span class="edu-score">CGPA: 8.44/10.0</span>
+                    <p style="font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:10px;">Focusing on Computer Science and Engineering. Developing advanced skills in Software Development Life Cycle (SDLC) and Data Engineering.</p>
+                </div>
+                <div class="edu-card">
+                    <span class="edu-year">2020 — 2022</span>
+                    <h3 class="edu-degree">Intermediate (MPC)</h3>
+                    <p class="edu-inst">Aditya Junior College</p>
+                    <span class="edu-score">Percentage: 92.4%</span>
+                    <p style="font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:10px;">Excelled in Mathematics and Physics, providing a logical base for my career in programming and analytics.</p>
+                </div>
+                <div class="edu-card">
+                    <span class="edu-year">2019 — 2020</span>
+                    <h3 class="edu-degree">Secondary School Certificate (10th)</h3>
+                    <p class="edu-inst">Aditya School</p>
+                    <span class="edu-score">GPA: 10.0/10.0</span>
+                    <p style="font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:10px;">Achieved perfect grade point average, demonstrating consistent academic dedication and problem-solving abilities.</p>
+                </div>
+            </div>
+        </section>
+
         <section id="skills" class="glowing-section">
             <h2 style="color:var(--primary-color);">Technical Skills</h2>
             <div id="skills-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px;"></div>
@@ -432,15 +512,12 @@
             document.getElementById('hero-photo').src = url;
         }
         
-        // --- UPDATED SKILLS RENDERING: Handling the array of objects as per image structure ---
         const dataSnap = await getDoc(doc(db, "admin_data", "data"));
         if (dataSnap.exists()) {
-            // Updated to pull 'skills_ordered' which is now an array
             const skills_ordered = dataSnap.data().skills_ordered || [];
             const skillsGrid = document.getElementById('skills-grid');
             skillsGrid.innerHTML = ''; 
 
-            // Iterate through the array objects (category, position, skills)
             skills_ordered.sort((a, b) => (a.position || 0) - (b.position || 0)).forEach((skillObj) => {
                 const category = skillObj.category;
                 const skillsString = skillObj.skills;
