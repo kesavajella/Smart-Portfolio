@@ -225,7 +225,32 @@
             .page { padding: 16px; margin: 12px; }
             .project-item { flex-direction: column; align-items: flex-start; gap: 8px; }
             .project-left { gap: 8px; }
-            .skill-category-row { flex-direction: column; align-items: stretch; }
+            
+            /* Skill Section Mobile: Checkbox, Number, Name side-by-side; Skills down */
+            .skill-category-row { 
+                flex-wrap: wrap; 
+                gap: 10px; 
+                justify-content: flex-start;
+            }
+            .skill-checkbox { order: 1; margin: 0 !important; }
+            .cat-pos-input { order: 2; margin: 0 !important; }
+            .cat-label { 
+                order: 3; 
+                min-width: unset; 
+                flex-grow: 1; 
+                margin: 0 !important; 
+            }
+            .cat-input-field { 
+                order: 4; 
+                width: 100% !important; 
+                flex-basis: 100%; 
+                margin: 4px 0 !important;
+            }
+            .skill-category-row button { 
+                order: 5; 
+                width: 100%; 
+                margin: 0 !important;
+            }
         }
     </style>
 </head>
@@ -235,7 +260,7 @@
         <h2>Admin Login</h2>
         <form id="login-form">
             <label for="username">Username:</label>
-            <input type="text" id="username" required>
+            <input type="text" id="username" placeholder="Type 'kesava' or your email" required>
             <label for="password">Password:</label>
             <input type="password" id="password" required>
             <button type="submit">Login</button>
@@ -343,7 +368,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc, updateDoc, query, orderBy, serverTimestamp, deleteField } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -370,6 +395,25 @@ let editingProjectId = null;
 let deleteImageFlag = false;
 let deleteVideoFlag = false;
 
+/* --- Auto Logout Logic --- */
+let logoutTimer;
+const TIMEOUT_DURATION = 30 * 60 * 1000; 
+
+function resetLogoutTimer() {
+    clearTimeout(logoutTimer);
+    if (auth.currentUser) {
+        logoutTimer = setTimeout(() => {
+            signOut(auth).then(() => {
+                window.location.reload();
+            });
+        }, TIMEOUT_DURATION);
+    }
+}
+
+['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+    document.addEventListener(event, resetLogoutTimer);
+});
+
 const loginPage = document.getElementById("login-page");
 const dashboardPage = document.getElementById("dashboard-page");
 const projectPage = document.getElementById("project-page");
@@ -377,15 +421,33 @@ const projectPage = document.getElementById("project-page");
 onAuthStateChanged(auth, user => {
     loginPage.classList.toggle("hidden", !!user);
     dashboardPage.classList.toggle("hidden", !user);
-    if (user) loadDashboard();
+    if (user) {
+        loadDashboard();
+        resetLogoutTimer();
+    } else {
+        clearTimeout(logoutTimer);
+    }
 });
 
+// --- OPTION 2: HARDCODED MAP STRATEGY ---
 document.getElementById("login-form").addEventListener("submit", async e => {
     e.preventDefault();
+    const userInput = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    
+    // Create your map here: "Nickname": "Real Firebase Email"
+    const userMap = {
+        "kesava78615": "kesavajella2006@gmail.com"
+    };
+
+    // If the input is in our map, use the mapped email. Otherwise, use what was typed.
+    const finalEmail = userMap[userInput] || userInput;
+    
     try {
-        await signInWithEmailAndPassword(auth, document.getElementById("username").value.trim(), document.getElementById("password").value);
+        await setPersistence(auth, browserSessionPersistence);
+        await signInWithEmailAndPassword(auth, finalEmail, password);
     } catch (err) {
-        document.getElementById("login-error").textContent = err.message;
+        document.getElementById("login-error").textContent = "Invalid username or password.";
     }
 });
 
@@ -432,10 +494,8 @@ function showToast(msg) {
 
 async function loadSkills() {
     const snap = await getDoc(DATA_DOC);
-    // Support legacy objects or new ordered arrays
     let skillsData = snap.exists() ? snap.data().skills_ordered || [] : [];
     
-    // Fallback for old data structure conversion
     if (!Array.isArray(skillsData) && snap.exists()) {
         const oldData = snap.data().skills_categorized || {};
         skillsData = Object.keys(oldData).map((cat, idx) => ({
@@ -445,7 +505,6 @@ async function loadSkills() {
         }));
     }
 
-    // Sort by position
     skillsData.sort((a, b) => (a.position || 0) - (b.position || 0));
 
     const container = document.getElementById("skills-list-admin");
@@ -533,7 +592,6 @@ document.getElementById("delete-selected-skills-btn").onclick = async () => {
         let skills_ordered = snap.exists() ? snap.data().skills_ordered || [] : [];
         
         const indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index));
-        // Filter out the items at those indices
         const filteredSkills = skills_ordered.filter((_, idx) => !indicesToDelete.includes(idx));
         
         await setDoc(DATA_DOC, { skills_ordered: filteredSkills }, { merge: true });
