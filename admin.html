@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Admin Login & Dashboard</title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
     <style>
         /* Basic layout */
         body {
@@ -380,8 +382,8 @@
             <label for="cert-org">Issuing Organization:</label>
             <input type="text" id="cert-org">
             
-            <label for="cert-image">Certificate Image:</label>
-            <input type="file" id="cert-image" accept="image/*">
+            <label for="cert-image">Certificate Image or PDF:</label>
+            <input type="file" id="cert-image" accept="image/*,application/pdf">
             <div id="cert-image-preview" class="media-preview-container hidden">
                 <p style="font-size: 12px; margin: 0 0 5px 0;">Current Image:</p>
                 <img src="" id="display-cert-img">
@@ -481,6 +483,25 @@ document.getElementById("login-form").addEventListener("submit", async e => {
 });
 
 document.getElementById("logout-button").onclick = () => signOut(auth);
+
+/* PDF Extraction Helper */
+async function extractImageFromPDF(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    await page.render({ canvasContext: context, viewport: viewport }).promise;
+    
+    return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+            resolve(new File([blob], "cert_image.png", { type: "image/png" }));
+        }, 'image/png');
+    });
+}
 
 async function uploadToCloudinary(file) {
     const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
@@ -674,16 +695,31 @@ document.getElementById("cert-form").addEventListener("submit", async e => {
         updatedAt: serverTimestamp()
     };
     try {
-        const file = document.getElementById("cert-image").files[0];
-        if (file) data.image = await uploadToCloudinary(file);
-        else if (!editingCertId) { alert("Image required"); return; }
+        let file = document.getElementById("cert-image").files[0];
+        
+        if (file) {
+            // Check if file is PDF
+            if (file.type === "application/pdf") {
+                status.textContent = "Extracting image from PDF...";
+                file = await extractImageFromPDF(file);
+                status.textContent = "Uploading extracted image...";
+            }
+            data.image = await uploadToCloudinary(file);
+        } else if (!editingCertId) { 
+            alert("Image or PDF required"); 
+            status.textContent = "";
+            return; 
+        }
 
         if (editingCertId) await updateDoc(doc(db, "certificates", editingCertId), data);
         else { data.createdAt = serverTimestamp(); await addDoc(CERTS, data); }
         
         certPage.classList.add("hidden"); dashboardPage.classList.remove("hidden");
         loadCertificates();
-    } catch (err) { status.textContent = "Error."; }
+    } catch (err) { 
+        console.error(err);
+        status.textContent = "Error processing file."; 
+    }
 });
 
 async function loadCertificates() {
